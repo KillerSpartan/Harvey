@@ -1,16 +1,24 @@
 const Discord = require('discord.js');
 const bot = new Discord.Client();
 
-const token = 'Nzk1ODg4MDU3OTExNjA3MzA2.X_P6gw.lsez1oSqhsCg09wsVmQ1YZ5_HX0';
+//Acceso y constantes 
+const token = 'token de Discord Developer Portal';
+const prefix = '!';
+const fs = require('fs');
+bot.commands = new Discord.Collection();
+const commandFiles = fs.readdirSync('./commands/').filter(file => file.endsWith('.js'));
 
-const prefix = '-';
+for(const file of commandFiles){ //Analiza el comando a ejecutar
+    const command = require(`./commands/${file}`);
+    bot.commands.set(command.name, command);
+}
 
+//Inicialización del bot - debbug
 bot.on('ready', () =>{
     console.log("This bot is online!");
 })
 
-
-
+//Selector de commandos
 bot.on("message", message =>{
     if(!message.content.startsWith(prefix) || message.author.bot) return;
     
@@ -18,9 +26,10 @@ bot.on("message", message =>{
     const command = args.shift().toLowerCase();
 
     if(command === 'ping'){
-        message.channel.send('pong!');
+        bot.commands.get('ping');
+    } else if(command === 'stela'){
+        bot.commands.get('stela').execute(message, args);
     }
 })
 
 bot.login(token);
-
